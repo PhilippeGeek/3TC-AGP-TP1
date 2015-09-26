@@ -1,6 +1,8 @@
 # 3TC-AGP-TP1
 Practice Work for C learning.
 
+Related lesson: http://moodle2.insa-lyon.fr/course/view.php?id=142
+
 ## Licencing stuff
  Copyright (C) 2015-2016 Philippe VIENNE - Gabriel AUGENDRE
 
