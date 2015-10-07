@@ -74,6 +74,7 @@ int processLine(FILE *data, FILE *outs[], stats *statistics) {
     int fileCode = -1;
     // Storage for the line content while we read
     char content[TAILLE_MAX_TRAME];
+    int dataLength = 0;
     initArray(content, TAILLE_MAX_TRAME, '\0');
     // Must store the hash
     // Hash var is also the tmp value when we are reading the line
@@ -91,24 +92,27 @@ int processLine(FILE *data, FILE *outs[], stats *statistics) {
                 return STOP; // We have try to read an empty line, consider as an EOF
             } else {
                 (*statistics).total++; // Increments the number of total lines
-                char value[7]; // The truncated value we should write
-                int hasEmptyElements = 0; // Flag to say if we have more or less than 7 char
-                int i;
-                for(i=0; i<7; i++){
-                    if (content[i] == '\0') { // Get an end of string before the 7th char
-                        value[i] = '?'; // Add some '?' chars
-                        hasEmptyElements = 1; // Update the flag
-                    } else {
-                        value[i] = content[i]; // Just copy our value
-                    }
-                }
                 if(hash != -1 && checkSum(content, hash)){
                     // If the hash is correct
                     if (hash == 0 && content[0] == '\0') // Means no data !
                         return CONTINUE; // Valid but empty data
-                    fprintf(outs[fileCode], "%s%hx\n", value, hasEmptyElements ? hash : 7); // Write formatted data
-                    (*statistics).data[fileCode] += hasEmptyElements ? hash : 7 +
-                                                                              1; // Increments statistics for this file
+                    int startIndex = 0;
+                    for(startIndex=0;startIndex<dataLength;startIndex+=7){
+                        char value[7]; // The truncated value we should write
+                        int i;
+                        int count = 0;
+                        for(i=startIndex; i<startIndex+7; i++){
+                            if (content[i] == '\0') { // Get an end of string before the 7th char
+                                value[i%7] = '?'; // Add some '?' chars
+                            } else {
+                                value[i%7] = content[i]; // Just copy our value
+                                count++;
+                            }
+                        }
+                        fprintf(outs[fileCode], "%s%hx\n", value, count); // Write formatted data
+                        (*statistics).data[fileCode] += count + 1; // Increments statistics for this file
+
+                    }
                     // Don't count the ? as value char, but count the hash added code.
                 } else {
                     // If the hash is not valid
@@ -140,6 +144,7 @@ int processLine(FILE *data, FILE *outs[], stats *statistics) {
                     assert(0); // If the message is longer than it should, stop all (System error)
                 }
                 content[readingIndex - 2] = (char) hash; // Put it in the content
+                dataLength++;
             }
             hash = c; // Consider the last read char as the hash char
         }
