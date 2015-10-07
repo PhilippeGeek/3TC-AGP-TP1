@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include "unmultiplexer.h"
 
-int main(char **args, int argc){
+int main() {
 
     // Open the original file with data
     FILE *data = fopen("data.txt", "r");
@@ -82,8 +82,9 @@ int processLine(FILE *data, FILE *outs[], stats *statistics) {
     int readingIndex = 0;
     // Current read char
     int c;
-    while ((c = fgetc(data)) !=
-           EOF) { // While we are not on EOF, we suppose that we should get a \n before the EOF, unless the line will be ignored
+    while ((c = fgetc(data)) != EOF) {
+        /* While we are not on EOF, we suppose that we should get a
+         * \n before the EOF, unless the line will be ignored */
         if (c == '\n') { // We reach the end of line, now we should write data
             hash = charToHex(hash); // Convert the ASCII valued hash to the Numeric value
             if(fileCode == -1) {
