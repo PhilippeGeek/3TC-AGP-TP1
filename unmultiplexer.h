@@ -31,7 +31,9 @@ struct stats{
     int data[MAX_OUT_FILES + 1];
 };
 
-int processLine(FILE *data, FILE *pFILE[], struct stats *stats1);
+typedef struct stats stats;
+
+int processLine(FILE *data, FILE *pFILE[], stats *stats1);
 int checkSum(char data[], int hash);
 int charToHex(int c);
 #endif //TP1_UNMULTIPLEXER_H
